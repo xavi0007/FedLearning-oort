@@ -1,0 +1,81 @@
+global_config:
+  seed: 1
+  USE_CUDA: False
+  USE_MPS: True
+  VERBOSE: False
+---
+data_config:
+  data_path: "./data/"
+  # dataset_name: "CIFAR10", "FashionMNIST", "EMNIST" , "MNIST"
+  dataset_name: "MNIST"
+  num_shards: 200
+  iid: True
+---
+fed_config:
+  C: 1
+  # K: 20
+  K: 3
+  R: 80
+  # E: 3
+  E: 1
+  B: 128
+  # B: 64
+  V: 1
+  learning_rate_scheduler: lr_scheduler.StepLR
+  criterion: torch.nn.CrossEntropyLoss
+  optimizer: torch.optim.SGD
+  multiplier_g: 1
+  # incentive: "RRAFL"
+  #RRAFL, Reverse, Greedy, SV, FIFL, Vanilla, 
+  incentive: "oort"
+  total_budget : 1000
+  exe_cost_per_client: 0.05
+  time_required: 0.5
+---
+optim_config:
+  lr: 0.01
+  momentum: 0.7
+---
+init_config:
+  init_type: "xavier"
+  init_gain: 1.0
+  gpu_ids: [0, 1, 2]
+---
+model_config:   
+  #put in exact string name of model class
+  # name: CNNCifar
+  # name: MNIST_Net
+  name: CNNFashion_Mnist
+  # in_features: 784
+  #for mnist, fmnist, emnist in_channels : 1
+  #Cifar = 3
+  # in_channels: 1
+  in_channels: 1
+  hidden_channels: 32
+  num_hiddens: 512
+  # num_hiddens: 64
+  #47 classes for emnist, balanced
+  #26 classes for emnist, letters
+  num_classes: 47
+---
+log_config:
+  log_path: "./log/"
+  log_name:  "FL.log"
+  tb_port: 5252
+  tb_host: "0.0.0.0"
+---
+reputation_config:
+  use_reputation: True
+  use_sparsify: True
+  reputation_threshold: 0.7
+  client_cost_per_data: 0.000667
+---
+badClient_config:
+  #"free_rider" or 'label_flip'
+  attack: "label_flip"
+  #probability of attack
+  prop_attack: 3
+  #number of bad clients, if number is 30, and total of 100 clients. then there is 70 good
+  bad_K: 1
+  make_bad_data: False
+  prop_bad_data: 3
